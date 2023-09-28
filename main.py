@@ -3,7 +3,6 @@ import os
 from claude_api import Client
 from telebot import types
 
-
 cookie = os.environ.get('cookie')
 claude_api = Client(cookie)
 
