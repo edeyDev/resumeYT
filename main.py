@@ -1,7 +1,8 @@
-import telebot
 import os
+import telebot
 from claude_api import Client
 from telebot import types
+from flask import Flask, request
 
 cookie = os.environ.get('cookie')
 claude_api = Client(cookie)
@@ -17,6 +18,19 @@ if BOT_TOKEN is None:
 bot = telebot.TeleBot(BOT_TOKEN)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Crear una instancia de la aplicación Flask
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    update = telebot.types.Update.de_json(request.stream.read().decode('utf-8'))
+    bot.process_new_updates([update])
+    return "OK"
+
+@app.route('/')
+def index():
+    return "Bot is running!"
+
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     bot.reply_to(message, "Howdy, how are you doing?")
@@ -27,7 +41,7 @@ def echo_all(message):
 
 @bot.message_handler(content_types=['document'])
 def receive_text_file(message):
-    # Verifica si el archivo 'hola.txt' ya existe
+    # Verifica si el archivo 'transcription.txt' ya existe
     file_path = os.path.join(BASE_DIR, 'transcription.txt')
     if os.path.exists(file_path):
         # Si existe, elimina el archivo existente
@@ -48,5 +62,6 @@ def receive_text_file(message):
     else:
         bot.reply_to(message, "El archivo no es 'transcription.txt', no se guardará.")
 
-# Inicia el bucle de polling
-bot.infinity_polling()
+if __name__ == '__main__':
+    # Ejecuta la aplicación Flask con Gunicorn
+    app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 8000)))
