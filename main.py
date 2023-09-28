@@ -7,7 +7,7 @@ from flask import Flask, request
 cookie = os.environ.get('cookie')
 claude_api = Client(cookie)
 
-# Reemplaza 'YOUR_BOT_TOKEN' con el token de tu bot de Telegram
+# Reemplaza 'YOUR_BOT_TOKEN' con el token kde tu bot de Telegram
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
 # Verifica si la variable de entorno BOT_TOKEN está definida
